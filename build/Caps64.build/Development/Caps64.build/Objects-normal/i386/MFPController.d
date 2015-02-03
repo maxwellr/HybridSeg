@@ -1,0 +1,22 @@
+dependencies: \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/MFPController.mm \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/MFPController.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/Caps64Filter.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/PluginFilter.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/DCMPix.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/ViewerController.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/OSIWindowController.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/DCMView.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/N3Geometry.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/MyPoint.h \
+  /Users/group64/Documents/osirixplugins/_help/Caps64/OsiriXAPI.framework/Headers/ROI.h \
+  /usr/local/include/opencv2/core/core.hpp \
+  /usr/local/include/opencv2/core/types_c.h \
+  /usr/local/include/opencv2/core/version.hpp \
+  /usr/local/include/opencv2/core/operations.hpp \
+  /usr/local/include/opencv2/core/mat.hpp \
+  /usr/local/include/opencv2/highgui/highgui.hpp \
+  /usr/local/include/opencv2/highgui/highgui_c.h \
+  /usr/local/include/opencv2/core/core_c.h \
+  /usr/local/include/opencv2/imgproc/imgproc.hpp \
+  /usr/local/include/opencv2/imgproc/types_c.h

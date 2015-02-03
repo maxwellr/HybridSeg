@@ -1,0 +1,6 @@
+/* Localized versions of Info.plist keys */
+
+CFBundleName = "Caps64";
+CFBundleShortVersionString = "1.0";
+CFBundleGetInfoString = "Caps64 version 1.0, Copyright (c) 2015 RJS.";
+NSHumanReadableCopyright = "Copyright (c) 2015 RJS.";

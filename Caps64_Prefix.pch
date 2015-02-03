@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the 'Caps64' target in the 'Caps64' project.
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <AppKit/AppKit.h>
+#endif
