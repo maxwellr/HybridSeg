@@ -20,7 +20,7 @@ using namespace std;
 using namespace cv;
 
 @interface MFPController : NSWindowController{
-    ViewerController* Vctrl;
+    NSArray* Vctrl;
     vector<Mat> lungMask;
     vector<Mat> boneMask;
     vector<Mat> softMask;
@@ -35,7 +35,7 @@ using namespace cv;
     IBOutlet NSPopUpButton *bonePop;
     IBOutlet NSPopUpButton *restPop;
 }
-@property(readonly) ViewerController* Vctrl;
+@property(readonly) NSArray* Vctrl;
 
 @property (strong, nonatomic) IBOutlet NSTextField *LW;
 @property (strong, nonatomic) IBOutlet NSTextField *LL;
@@ -50,7 +50,7 @@ using namespace cv;
 
 // GUI functions //
 
--(void)initViewerW:(ViewerController*)mViewer; //get pointer of current  viewer
+-(void)initViewerW:(NSArray*)mViewer; //get pointer of current  viewer
 -(void)initMasks; // initilize masks after first load
 -(void)UpdateView; //Update current view hybrid with current settings
 -(Mat) ApplyHybrid:(Mat)Slice :(int)SliceN; // reads the settings on GUI and returns a hybrid mat file

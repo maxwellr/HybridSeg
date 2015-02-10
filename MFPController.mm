@@ -12,14 +12,15 @@
 #define IMG_SIZE 512
 #define LWR_LUNG_AREA 200.0
 #define UPR_LUNG_AREA 50000.0
-#define LUNG_THRESH 32
-#define BONE_THRESH 251.0 //lower value picks up more grey stuff. can't be >255
+#define LUNG_THRESH 33
+#define BONE_THRESH 254.0 //lower value picks up more grey stuff. can't be >255
 #define SOFT_THRESH 30.0
 #define SOFT_BOUND 50000.0
 #define SOFT_WNDW 350
 #define SOFT_LVL 40
 #define LUNG_WNDW 1500
 #define LUNG_LVL 300
+#define BONE_MAX 92
 #import "MFPController.h"
 
 @implementation MFPController
@@ -42,9 +43,11 @@
 }
 
 ///* Copy the OsiriX active window pointer
--(void)initViewerW:(ViewerController*) mViewer{
+-(void)initViewerW:(NSArray*) mViewer{
     
-    Vctrl=mViewer;
+    Vctrl = [[NSArray alloc] initWithArray:mViewer];
+    NSLog(@"%d", [Vctrl count]);
+    
 }
 
 //***************** Update Window Levels *******************
@@ -104,7 +107,7 @@
 {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:@"Starting Segmentation."];
-    [alert setInformativeText:@"Press Ok to Continue..."];
+    [alert setInformativeText:@"Press OK to Start"];
     [alert addButtonWithTitle:@"Ok"];
     [alert runModal];
     [self initMasks];
@@ -154,25 +157,17 @@
     temp.copyTo(bones,boneMask[SliceN]);
     //Apply bone window
     bones = [self applyWin:(bones) :([BW floatValue]) :([BL floatValue])];
+    if(SliceN == 60 ){
+        imshow("bone mask", boneMask[SliceN]);
+        imshow("bone",bones);
+    }
     
-    //Copy pixels from slice into soft according to Soft Mask
     temp.copyTo(soft,softMask[SliceN]);
-    if(SliceN == 60){
-        imshow("org",soft);
-    }
     soft = [self applyWin:(soft) :([RW floatValue]) :([RL floatValue])];
-    if(SliceN == 60){
-        imshow("wndw",soft);
-    }
+    
     //Combine Tissues together
     addWeighted(lungs, 1, bones, 1, 0.0, hybrid);
     addWeighted(hybrid, 1, soft, 1, 0.0, hybrid);
-    
-    if(SliceN==50){
-        imshow("soft mask",softMask[SliceN]);
-        imshow("soft tissue", soft);
-        
-    }
     
     return hybrid;
 }
@@ -184,7 +179,7 @@
     float            *fImage;   // Grey Image
     Mat res;
     
-    NSArray     *PixList = [Vctrl pixList];
+    NSArray     *PixList = [[Vctrl firstObject] pixList];
     
     int i;
     for (i = 0; i < [PixList count]; i++) //i<
@@ -221,7 +216,7 @@
     unsigned char           tdimg[IMG_SIZE * IMG_SIZE];
     
     
-    NSArray     *PixList = [Vctrl pixList];
+    NSArray     *PixList = [[Vctrl firstObject] pixList];
     
     int i;
     for (i = 0; i < [PixList count]; i++) //i<
@@ -381,20 +376,21 @@
     }
     //binary = [self applyWin:binary :2682 :1171]; //random WL tried in osirix for a better segmentation of the bones to exclude the soft tissue. this has a bone_thresh of 40
     binary = [self applyWin:binary :SOFT_WNDW :SOFT_LVL];
+    //binary = [self applyWin:binary :1847 :1155];
     cv::threshold(binary, binary, BONE_THRESH, 255, THRESH_BINARY);
     
     Mat erode;
     cv::erode(binary,erode,cv::Mat(),cv::Point(-1,-1),1.2);
     
     Mat dilate;
-    cv::dilate(binary,dilate,cv::Mat(),cv::Point(-1,-1),9);
+    cv::dilate(binary,dilate,cv::Mat(),cv::Point(-1,-1),3);
     
     cv::threshold(dilate,dilate,1, 128,cv::THRESH_BINARY_INV);
     
     // add images
-    Mat sum(binary.size(),CV_8U,cv::Scalar(0));
+      Mat sum(binary.size(),CV_8U,cv::Scalar(0));
     sum= erode+dilate;
-    
+   
     sum.convertTo(sum,CV_32S);
     cvtColor(org_img, org_img, CV_GRAY2BGR);
     watershed(org_img, sum);
@@ -402,6 +398,32 @@
     
     Mat bone_BW = cv::Mat::zeros(org_img.size(), org_img.type());
     inRange(sum, cv::Scalar(255, 255, 255), cv::Scalar(255, 255, 255), bone_BW); //fill the extracted mask with white color
+
+    //REMOVING ARTIFACTS
+    cv::vector<vector<cv::Point> > borders;
+    cv::vector<Vec4i> hierachy;
+    
+    findContours(bone_BW, borders, hierachy, RETR_LIST, CHAIN_APPROX_SIMPLE);
+    //Chain_approx_simple reduces number of contour points
+    
+    Mat bones = org_img.clone();
+    double minVal,maxVal;
+    Scalar color(0,0,255);
+    
+    for (size_t i = 0; i < borders.size(); i++)
+    {
+        Mat temp = cv::Mat::zeros(org_img.size(),org_img.type());
+        drawContours(temp, borders, i, color,CV_FILLED, 8, hierachy,0,cv::Point());
+        org_img.copyTo(temp,temp);
+        cv::minMaxLoc(temp, &minVal,&maxVal,NULL,NULL,noArray());
+        NSLog(@"%f, %f", minVal,maxVal);
+        if(maxVal > BONE_MAX)
+        {
+            drawContours(bones, borders, i, color,CV_FILLED, 8, hierachy,0,cv::Point());
+        }
+    }
+    
+    inRange(bones, color, color, bone_BW);
     
     return bone_BW;
 }

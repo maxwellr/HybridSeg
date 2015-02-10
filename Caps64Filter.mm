@@ -18,8 +18,12 @@
     
     //Create the adjustment window
     MFPController *window = [[MFPController alloc] initWithWindowNibName:@"MFPController"];
-    [window initViewerW:viewerController ];
+   
+    NSArray *viewers = [ViewerController get2DViewers];
+
+    [window initViewerW:viewers ];
     [window showWindow:nil];
+    [window.window setLevel: NSMainMenuWindowLevel];
     //adjustment window created
     
     return 0;
