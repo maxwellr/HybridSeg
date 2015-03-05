@@ -19,7 +19,7 @@
     //Create the adjustment window
     MFPController *window = [[MFPController alloc] initWithWindowNibName:@"MFPController"];
    
-    NSArray *viewers = [ViewerController get2DViewers];
+    NSArray *viewers = [ViewerController getDisplayed2DViewers];
 
     [window initViewerW:viewers ];
     [window showWindow:nil];
